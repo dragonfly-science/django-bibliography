@@ -1,0 +1,17 @@
+{% for r in references %}
+<div class="reference">
+{{ r.html|safe }}
+</div>
+<div class="reference_details">
+[ <a href='/references/{{r.name}}.html'>Summary</a> 
+{% for rr in r.res_list %}
+            {% if rr.short_name %}
+                {% if rr.file %} | <a href="/{{ rr.file }}">{{ rr.short_name }} ({{ rr.type }}, {{ rr.size }})</a>
+                {% else %}{% if rr.url %} | <a href="{{ rr.url }}">{{ rr.short_name }}</a>{% endif %}
+                {% endif %}
+            {% endif %}
+            {% if user.is_authenticated %}{% if perms.website.administration %} | <a href="/admin/bibliography/reference/{{ r.id }}">EDIT</a>{% endif %}{% endif %}
+{% endfor %} ]
+</div>
+{% endfor %}
+

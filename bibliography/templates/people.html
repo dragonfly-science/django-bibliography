@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load markup %}
+{% block content %}
+<br>
+{% for person in person_list %}
+    {% if user.is_authenticated and perms.website.administration %}
+        <p><a class="pageedit" href="{% url admin:filling_person_change person.id %}">Edit {{ person.firstname }}</a></p>
+    {% endif %}
+	{% if person.active %}
+    {% if person.has_link %}
+    <h2><a href="{{ person.get_absolute_url }}">{{ person.firstname }} {{ person.lastname }}</a></h2>
+    {% else %}
+    <h2>{{ person.firstname }} {{ person.lastname }}</h2>
+    {% endif %}
+	{% if person.image %}
+        {% if person.has_link %}
+		<div class="figure figure-right"><a href="{{ person.get_absolute_url }}"><img width="100px" src="{{ person.image.image.url }}" alt="{{person.image.image.title}}" ></a></div>
+        {% else %}
+		<div class="figure figure-right"><img width="100px" src="{{person.image.image.url}}" alt="{{person.image.image.title}}" ></div>
+        {% endif %}
+	{% endif %}
+    {% if person.email or person.phone or person.mobile %}
+	<p>
+    {% if person.email %}
+	<a href="mailto:{{person.email}}">{{person.email}}</a>
+	{% endif %}
+    {% if person.phone or person.mobile %}
+    <br><span class="phone">{% if person.phone %}Phone: {{ person.phone }}{% endif %}{% if person.mobile %} Mobile: {{ person.mobile }}{% endif %}</span>
+    {% endif %}
+    </p>
+    {% endif %}
+    {% if person.teaser %}
+		{{ person.teaser|markdown }}
+	{% endif %}
+    <br>
+	{% endif %}
+{% endfor %}
+{% endblock %}

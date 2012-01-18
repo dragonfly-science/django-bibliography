@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'Dragonfly website admin' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href='{{ site_url }}'>{{site_url }}</a>   -  {{ database_host }} </h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if user.is_authenticated and perms.website.administration %}
+  <p style="float:right"><a class="fade" href="{% url admin:bibliography_reference_change current.id %}">Edit Reference</a></p>
+{% endif %}
+
+<div class="reference_title"><h2>{{ current.title }}</h2></div>
+{% if current.authors %}
+<p>{{ current.authors }}</p>
+{% endif %}
+
+<h3>Citation</h3>
+{{ current.html|safe }}
+
+{% if current.doi %}
+<p><a href="http://dx.doi.org/{{ current.doi }}">DOI: {{ current.doi }}</a></p>
+{% endif %}
+
+{% if current.abstract != None %}
+<h3>Summary</h3>
+<div style="reference_abstract"><p>{{ current.abstract|safe }}</p></div>
+{% endif %}
+
+<br>
+<h3>Resources</h3>
+<div class=itemlist>
+<ul>
+{% for r in current.res_list %}
+{% if r.name %}
+{% if r.file %}
+<li><p><a href=/{{ r.file }}>{{ r.name }} ({{ r.type }}, {{ r.size }})</a></p></li>
+{% else %}
+{% if r.url %}
+<li><p><a href={{ r.url }}>{{ r.name }}</a></p></li>
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+<li><p><a href=/references/{{ current.name }}.bib>Download citation in bibtex format </a></p></li>
+</ul>
+</div>
+<br>
+
+
+{% if current.title %} 
+<h3>Search</h3>
+<div class=itemlist>
+<ul>
+<li><p><a href="http://scholar.google.com/scholar?hl=en&q={{ current.title|urlencode:'' }}">Search for this document on Google Scholar</a></p></li>
+<li><p><a href="http://www.google.com/search?hl=en&q={{ current.title|urlencode:''}}">Search for this document on Google</a></p></li>
+</ul>
+</div>
+{% endif %}
+
+{% endblock %}
+

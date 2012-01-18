@@ -1,0 +1,24 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n adminmedia %}
+
+{% block content %}
+
+<div class=reflist>
+
+<ul>
+{% for r in references %}
+<li><a href=/references/{{r.name}}.html>{{ r.html|safe }}</a></li>
+<p>
+{% if r.tags.count %}
+<ul>
+{% for t in r.tags.all %}
+<li> <p> {{ t.name }} </p> </li>
+{% endfor %}
+</ul>
+{% endif %}
+</p>
+{% endfor %}
+</ul>
+</div>
+
+{% endblock %}
