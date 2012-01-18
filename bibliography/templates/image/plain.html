@@ -1,9 +1,0 @@
-{% autoescape off %}
-<div class="figure {% ifequal placement.place "R" %} figure-right" {% else %} figure-center" {% endifequal %} {% if placement.width %}style="width: {{placement.width}}px" {% endif %}> 
-{% if placement.gotourl %} <a href={{ placement.gotourl }}> {% endif %}
-<img src="/{{ placement.url }}" alt="{{ placement.image.title }}" {% if placement.width %} width="{{ placement.width }}" {% endif %} {% if placement.height %} height="{{ placement.height }}" {% endif %} >
-{% if placement.gotourl %} </a> {% endif %}
-{% if placement.caption %}<p class="caption">{{ placement.caption }}</p>{% endif %}
-{% if placement.image.credit %}<p class="credit">{{ placement.image.credit }}</p>{% endif %}
-</div>
-{% endautoescape %}
