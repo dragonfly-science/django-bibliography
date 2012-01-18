@@ -40,7 +40,7 @@ def convert_bytes(bytes):
     return size
 
 class Reference(models.Model):
-    name = models.SlugField(max_length=50, editable=False)
+    key = models.SlugField(max_length=50, editable=False)
     bibtex = models.TextField()
     year = models.IntegerField(editable=False, null=True, blank=True)
     html = models.TextField(editable=False)
@@ -52,14 +52,14 @@ class Reference(models.Model):
     tags = TaggableManager()
 
     def __unicode__(self):
-        return "%s:%s" % (self.name, self.id)
+        return "%s:%s" % (self.key, self.id)
 
     class Meta:
-        unique_together = ("name",)
-        ordering = ('sort', '-year', 'name')
+        unique_together = ("key",)
+        ordering = ('sort', '-year', 'key')
     
     def get_absolute_url(self):
-        return "%s/references/%s.html"%(settings.SITE_URL, self.name)
+        return "%s/references/%s.html"%(settings.SITE_URL, self.key)
 
     def the_tags(self):
         return ", ".join([t.name for t in self.tags.all()])
@@ -68,7 +68,7 @@ class Reference(models.Model):
     def save(self):
         if hasattr(self, '_tree'):  #Make sure cached copy of the xml tree is removed before parsing
             del self._tree
-        self.name = self.get_name()
+        self.key = self.get_key()
         self.year = self.get_year()
         self.html = self.get_html()
         self.sort = self.get_sort()
@@ -77,7 +77,7 @@ class Reference(models.Model):
         self.abstract = self.get_abstract()
         self.doi = self.get_doi()
         try:
-            existing = Reference.objects.get(name=self.name)
+            existing = Reference.objects.get(key=self.key)
             self.id = existing.id
         except ObjectDoesNotExist:
             pass
@@ -152,7 +152,7 @@ class Reference(models.Model):
         fullnames = []
         for author in self.xml_findall('name'):
             fullname = []
-            for part in author.findall(".//{%s}%s"%(MODS_URI, 'namePart')):
+            for part in author.findall(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, 'namePart')):
                 fullname.append(part.text)
             fullnames.append(' '.join(fullname))
         if len(fullnames)>1:
@@ -172,7 +172,7 @@ class Reference(models.Model):
     def get_title(self):          
         return self.xml_findtext('title')
 
-    def get_name(self):
+    def get_key(self):
         return self.xml_find('mods').get('ID')
     
     def get_year(self): 
@@ -200,12 +200,12 @@ class Reference(models.Model):
             raise ValidationError('Error parsing xml: %s ' % e)
         return xml
     
-    def get_html(self):
+    def get_html(self, csl=BIBLIOGRAPHY_CSL):
         bibtex = unicodedata.normalize('NFKD', unicode(self.bibtex)).encode('ascii','xmlcharrefreplace')
         bibtex = re.sub('\t','    ', bibtex)
         bibtex = re.sub('\n\s*\n', '<br><br>', bibtex)
         try:
-            p = Popen(['bib2html', BIBLIOGRAPHY_CSL], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            p = Popen(['bib2html', csl], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             html, err = p.communicate(bibtex)
             if p.returncode != 0:
                 logging.warn("get_html return code = %s" % p.returncode)
@@ -215,9 +215,9 @@ class Reference(models.Model):
             logging.warn("Execution of bib2html failed: %s" % e)
         return html
 
-    def get_sort(self):
+    def get_sort(self, csl=BIBLIOGRAPHY_CSL):
         try:
-            p = Popen(['bib2sort', BIBLIOGRAPHY_CSL], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            p = Popen(['bib2sort', csl], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             sort, err = p.communicate(self.bibtex)
             if p.returncode != 0:
                 logging.warn("get_sort return code = %s" % p.returncode)
@@ -234,13 +234,13 @@ class Reference(models.Model):
         return self._tree
     
     def xml_find(self, tag):
-        return self.get_xml_tree().find(".//{%s}%s"%(MODS_URI, tag))
+        return self.get_xml_tree().find(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findtext(self, tag):
-        return self.get_xml_tree().findtext(".//{%s}%s"%(MODS_URI, tag))
+        return self.get_xml_tree().findtext(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findall(self, tag):
-        return self.get_xml_tree().findall(".//{%s}%s"%(MODS_URI, tag))
+        return self.get_xml_tree().findall(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
 
 class Resource(models.Model):
     reference = models.ForeignKey('Reference')

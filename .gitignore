@@ -1,3 +1,4 @@
+bibliography.sqlite
 build/*
 *.pyc
 *~

@@ -3,7 +3,7 @@ import sys
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'cuckoo.sqlite'
+        'NAME': 'bibliography.sqlite'
     }
 }
 MEDIA_ROOT = '.'
