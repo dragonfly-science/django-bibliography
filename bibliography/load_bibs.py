@@ -53,7 +53,7 @@ def get_keywords(txt):
 cont =  contents.split("@")
 cont.pop(0)
 
-def get_name(txt):
+def get_key(txt):
     a = re.search('{\s*([\w-]+)\s*,',txt)
     if a:
         return(a.group(1))
@@ -64,17 +64,17 @@ def get_relfile(txt):
         a = a[0]
         return [s.strip() for s in a.split(',')]
 
-allnames = [x.name for x in Reference.objects.all()]
+allkeys = [x.key for x in Reference.objects.all()]
 
 nsuccess = 0
 nfail = 0
 nfiles = 0
 
 for rec in cont:
-    rname = get_name(rec)
-    ref = Reference.objects.filter(name = rname)
+    rkey = get_key(rec)
+    ref = Reference.objects.filter(key = rkey)
     if ref:
-        bib = Reference.objects.get(name = rname)
+        bib = Reference.objects.get(key = rkey)
         bib.bibtex = '@%s' % rec
         action = 'Updating'
     else:
@@ -88,8 +88,8 @@ for rec in cont:
         print "Warning: Failed to load @%s" % rec
         nfail += 1
         continue
-    if not rname in allnames or options.force:
-        print "%s %s" % (action, rname)
+    if not rkey in allkeys or options.force:
+        print "%s %s" % (action, rkey)
         bib.save()
         if options.clear:
             bib.tags.clear()
@@ -105,19 +105,19 @@ for rec in cont:
         if keywords:
             for k in keywords:
                 bib.tags.add(k)
-        if os.path.exists('files/%s' % rname):
-            files = os.listdir('files/%s' % rname)
+        if os.path.exists('files/%s' % rkey):
+            files = os.listdir('files/%s' % rkey)
             for f in files:
-                shutil.copy('files/%s/%s' % (rname, f), '%s/resources/%s' % (settings.MEDIA_ROOT, f))
+                shutil.copy('files/%s/%s' % (rkey, f), '%s/resources/%s' % (settings.MEDIA_ROOT, f))
                 res = bib.resource_set.create(file='resources/%s' % f, title='%s' % f)
                 print 'Found and added %s' % f
                 nfiles += 1
         bib.save()
         nsuccess += 1    
-        allnames.append(rname.decode())
+        allkeys.append(rkey.decode())
 
     else:
-        print "Skipped pre-existing key: %s" % rname
+        print "Skipped pre-existing key: %s" % rkey
         nfail += 1
 
 print "\n=> Imported %i references and %i files. %i failed." % (nsuccess, nfiles, nfail)

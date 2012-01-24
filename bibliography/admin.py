@@ -11,37 +11,6 @@ import logging
 
 from bibliography.models import Reference, Resource
 
-#class UpdatedFilterSpec(FilterSpec):
-#    def __init__(self, f, request, params, model, model_admin, field_path=None):
-#        super(UpdatedFilterSpec, self).__init__(f, request, params, model, model_admin)
-#        if isinstance(f, models.ManyToManyField):
-#            self.lookup_title = f.rel.to._meta.verbose_name
-#        else:
-#            self.lookup_title = f.verbose_name
-#        self.null_lookup_kwarg = '%s__isnull' % f.name
-#        self.null_lookup_val = request.GET.get(self.null_lookup_kwarg, None)
-#        rel_name = f.rel.get_related_field().name
-#        self.lookup_kwarg = '%s__%s__exact' % (f.name, rel_name)
-#        self.lookup_val = request.GET.get(self.lookup_kwarg, None)
-#        self.lookup_choices = f.get_choices(include_blank=False)
-#
-#    def title(self):
-#        return self.lookup_title
-#
-#    def choices(self, cl):
-#        yield {'selected': self.lookup_val is None and self.null_lookup_val is None,
-#               'query_string': cl.get_query_string({}, [self.lookup_kwarg,self.null_lookup_kwarg]),
-#               'display': ('All')}
-#        yield {'selected': self.lookup_val is None and self.null_lookup_val=="True",
-#               'query_string': cl.get_query_string({self.null_lookup_kwarg:True},[self.lookup_kwarg]),
-#               'display': ('Current')}
-#        yield {'selected': self.lookup_val is None and self.null_lookup_val=="False",
-#               'query_string': cl.get_query_string({self.null_lookup_kwarg:False},[self.lookup_kwarg]),
-#               'display': ('Previous versions')}
-#
-#FilterSpec.filter_specs.insert(0, (lambda f: f.name == 'updated', UpdatedFilterSpec))
-#
-
 class ResourceInline(admin.TabularInline):
     model = Resource
     extra = 0
@@ -55,12 +24,12 @@ class ReferenceForm(forms.ModelForm):
         model = Reference    
 
 class ReferenceAdmin(VersionAdmin):
-    list_display = ('name', 'the_tags', 'year', 'reference', 'with_resources')
+    list_display = ('key', 'the_tags', 'year', 'reference', 'with_resources')
     search_fields = ('bibtex',)
     save_on_top = True
     form = ReferenceForm
     list_filter = ('year', 'tags__name')
-    readonly_fields = ('name', 'year', 'reference', 'abstract', 'doi')
+    readonly_fields = ('key', 'year', 'reference', 'abstract', 'doi')
     inlines = [ResourceInline,]
     actions = ['remove_tags', 'add_tag_edward', 'add_tag_finlay', 'add_tag_yvan', 'add_tag_seabird_bycatch', 'add_tag_habitat_fragmentation','get_tags_from_keywords', 'get_bibtex']
     

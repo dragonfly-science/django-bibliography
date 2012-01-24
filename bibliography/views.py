@@ -33,7 +33,7 @@ def listview(request, query):
     if year:
         references = references.filter(year=year)
     if key:
-        references = references.filter(name__in=key)
+        references = references.filter(key__in=key)
     references = references.distinct()
     if order:
         references = references.order_by(*order)
@@ -67,7 +67,7 @@ def tagging(request,  name):
             ))
 
 def get_bib(request, key):
-    bib = Reference.objects.filter(name = key)[0].bibtex
+    bib = Reference.objects.filter(key = key)[0].bibtex
     return render_to_response('references/bib.bib', dict(
                 bib = bib), mimetype='text/plain')
 
