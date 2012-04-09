@@ -8,4 +8,14 @@ DATABASES = {
 }
 MEDIA_ROOT = '.'
 
-INSTALLED_APPS = ['bibliography']
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.markup',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'bibliography',
+    'taggit')
+
+SECRET_KEY = 'secret_key'

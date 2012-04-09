@@ -1,6 +1,6 @@
 import os
 
-from django.utils import unittest
+import unittest
 
 from bibliography.models import Reference
 

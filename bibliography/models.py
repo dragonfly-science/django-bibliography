@@ -4,13 +4,14 @@ import xml.etree.ElementTree as ET
 from StringIO import StringIO
 import logging
 import re  
+import unicodedata
+
 from settings import MEDIA_ROOT
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
 from taggit.managers import TaggableManager
-import unicodedata
 
 try:
     from settings import BIBLIOGRAPHY_CSL
