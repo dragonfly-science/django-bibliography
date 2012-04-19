@@ -93,12 +93,6 @@ for rec in cont:
         bib.save()
         if options.clear:
             bib.tags.clear()
-        if re.search('Abraham, E', bib.html) or re.search('Abraham, E', bib.bibtex): 
-            bib.tags.add('edward-abraham')
-        if re.search('Thompson, F', bib.html): 
-            bib.tags.add('finlay-thompson')
-        if re.search('Richard, Y', bib.html):  
-            bib.tags.add('yvan-richard')
         for a in options.tags:
                     bib.tags.add(a)
         keywords = get_keywords(rec)

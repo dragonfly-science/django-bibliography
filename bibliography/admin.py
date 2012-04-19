@@ -31,7 +31,7 @@ class ReferenceAdmin(VersionAdmin):
     list_filter = ('year', 'tags__name')
     readonly_fields = ('key', 'year', 'reference', 'abstract', 'doi')
     inlines = [ResourceInline,]
-    actions = ['remove_tags', 'add_tag_edward', 'add_tag_finlay', 'add_tag_yvan', 'add_tag_seabird_bycatch', 'add_tag_habitat_fragmentation','get_tags_from_keywords', 'get_bibtex']
+    actions = ['remove_tags', 'get_tags_from_keywords', 'get_bibtex']
     
     def parent(self, obj):
         return '<a href="%s">Previous version</a>' % obj.parent.get_absolute_url() if obj.parent else ''
@@ -40,26 +40,6 @@ class ReferenceAdmin(VersionAdmin):
         return obj.html
     reference.allow_tags=True
 
-    def add_tag_edward(self, request, queryset):
-        for ref in queryset:
-            ref.tags.add('edward-abraham')
-    add_tag_edward.short_description = "Add tag edward-abraham"
-    def add_tag_finlay(self, request, queryset):
-        for ref in queryset:
-            ref.tags.add('finlay-thompson')
-    add_tag_finlay.short_description = "Add tag finlay-thompson"
-    def add_tag_yvan(self, request, queryset):
-        for ref in queryset:
-            ref.tags.add('yvan-richard')
-    add_tag_yvan.short_description = "Add tag yvan-richard"    
-    def add_tag_seabird_bycatch(self, request, queryset):
-        for ref in queryset:
-            ref.tags.add('seabird-bycatch')
-    add_tag_seabird_bycatch.short_description = "Add tag seabird-bycatch"
-    def add_tag_habitat_fragmentation(self, request, queryset):
-        for ref in queryset:
-            ref.tags.add('habitat-fragmentation')
-    add_tag_habitat_fragmentation.short_description = "Add tag habitat-fragmentation"
     def remove_tags(self, request, queryset):
         for ref in queryset:
             ref.tags.clear()
