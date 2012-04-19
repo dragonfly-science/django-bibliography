@@ -15,7 +15,7 @@ from bibliography.models import Reference
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (make_option('-o', '--output', dest='output', help='Output file'), )
-    option_list = BaseCommand.option_list + (make_option('-t', '--tags', dest='tags', action='append', help='Filter references with specified tags'), )
+    option_list = option_list + (make_option('-t', '--tags', dest='tags', action='append', help='Filter references with specified tags'), )
 
     def handle(self, *args, **options):
         refs = Reference.objects.all()
