@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bibliography.models import Reference
 
-class GetBibsCommand(BaseCommand):
+class ExportBibsCommand(BaseCommand):
     option_list = BaseCommand.option_list + (make_option('-o', '--output', dest='output', help='Output file'), )
     option_list = BaseCommand.option_list + (make_option('-t', '--tags', dest='tags', action='append', help='Filter references with specified tags'), )
     self.can_import_settings = True
