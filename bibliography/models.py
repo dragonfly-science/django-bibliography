@@ -8,7 +8,7 @@ import unicodedata
 
 from settings import MEDIA_ROOT
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
 from taggit.managers import TaggableManager
