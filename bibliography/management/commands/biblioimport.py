@@ -109,8 +109,4 @@ class Command(BaseCommand):
                 self.stderr.write("Skipped pre-existing key: %s" % rkey)
                 nfail += 1
 
-        self.stdout.write("\n=> Imported %i references and %i files. %i failed." % (nsuccess, nfiles, nfail))
-
-
-
-
+        self.stdout.write(os.linesep + "=> Imported %i references and %i files. %i failed." % (nsuccess, nfiles, nfail))
