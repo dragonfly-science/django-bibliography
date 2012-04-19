@@ -19,3 +19,4 @@ INSTALLED_APPS = (
     'taggit')
 
 SECRET_KEY = 'secret_key'
+SITE_ID = 1
