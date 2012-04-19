@@ -13,21 +13,17 @@ from django.core.management.base import BaseCommand, CommandError
 
 from bibliography.models import Reference
 
-class ExportBibsCommand(BaseCommand):
+class Command(BaseCommand):
     option_list = BaseCommand.option_list + (make_option('-o', '--output', dest='output', help='Output file'), )
     option_list = BaseCommand.option_list + (make_option('-t', '--tags', dest='tags', action='append', help='Filter references with specified tags'), )
-    self.can_import_settings = True
 
     def handle(self, *args, **options):
-        from django.conf import settings
-        setup_environ(settings)
-
         refs = Reference.objects.all()
-        if options.tags:
-            for t in options.tags:
+        if options["tags"]:
+            for t in options["tags"]:
                 refs = refs.filter(tags__name = t)
 
-        bib = '\n\n'.join(r.bibtex for r in refs)
+        bib = (os.linesep*2).join(r.bibtex for r in refs)
 
-        with open(options.output or 'references.bib', 'w') as f:
+        with open(options["output"] or 'references.bib', 'w') as f:
             f.write(bib)
