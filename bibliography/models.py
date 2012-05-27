@@ -6,7 +6,6 @@ import logging
 import re  
 import unicodedata
 
-from settings import MEDIA_ROOT
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
@@ -108,7 +107,7 @@ class Reference(models.Model):
             ffile = f.file
             if ffile:
                 rel_url = ffile.url
-                abs_url = os.path.join(MEDIA_ROOT, rel_url)
+                abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
                 f_size = convert_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=f.title, file=rel_url, type=f_type, size=f_size))
@@ -129,7 +128,7 @@ class Reference(models.Model):
         for r in allres:
             if r.file:
                 rel_url = r.file.url
-                abs_url = os.path.join(MEDIA_ROOT, rel_url)
+                abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
                 f_size = convert_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=r.title, short_name=r.list_title, file=rel_url, type=f_type, size=f_size, url=None, pos=r.pos))
