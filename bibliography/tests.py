@@ -42,6 +42,8 @@ erdos ="""@inproceedings{bollobas1976cliques,
 }"""
 
 csl = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apa.csl') 
+
+# \u2013 is an endash
 html = u'<p>Steinhauser, G. (2009). The nature of navel fluff. <em>Medical hypotheses</em>, <em>72</em>(6), 623\u2013625.</p>\n'
 
 class AccentTestCase(TestCase):
