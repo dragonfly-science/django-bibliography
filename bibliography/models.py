@@ -41,7 +41,9 @@ def convert_bytes(bytes):
 
 class Reference(models.Model):
     key = models.SlugField(max_length=50, editable=False)
+
     bibtex = models.TextField()
+
     year = models.IntegerField(editable=False, null=True, blank=True)
     html = models.TextField(editable=False)
     sort = models.TextField(editable=False, null=True, blank=True)
@@ -208,12 +210,15 @@ class Reference(models.Model):
             p = Popen(['bib2html', csl], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             html, err = p.communicate(bibtex)
             if p.returncode != 0:
+                if settings.DEBUG:
+                    logging.error("get_html stdout = %s" % html)
+                    logging.error("get_html stderr = %s" % err)
                 logging.warn("get_html return code = %s" % p.returncode)
                 html = ''
         except OSError, e:
             html = ''
             logging.warn("Execution of bib2html failed: %s" % e)
-        return html
+        return html.decode('utf-8')
 
     def get_sort(self, csl=BIBLIOGRAPHY_CSL):
         try:
@@ -245,7 +250,7 @@ class Reference(models.Model):
 class Resource(models.Model):
     reference = models.ForeignKey('Reference')
     file = models.FileField(upload_to='resources', null=True, blank=True, max_length=256)
-    url = models.URLField(verify_exists=False, null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
     title = models.CharField(max_length=255,null=True, blank=True)
     list_title = models.CharField(max_length=255, null=True, blank=True)
     pos = models.IntegerField(null=True, blank=True)

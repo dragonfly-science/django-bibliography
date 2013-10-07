@@ -1,5 +1,3 @@
-import sys
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -15,8 +13,12 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+
+    'south',
+    'taggit',
+
     'bibliography',
-    'taggit')
+)
 
 SECRET_KEY = 'secret_key'
 SITE_ID = 1

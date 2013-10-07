@@ -1,7 +1,5 @@
 from django.contrib import admin
 from reversion.admin import VersionAdmin
-from django.contrib.admin.filterspecs import FilterSpec
-from django.db import models
 from django import forms
 
 from django.http import Http404, HttpResponseRedirect, HttpResponse

@@ -1,6 +1,6 @@
 import os
 
-import unittest
+from django.test import TestCase
 
 from bibliography.models import Reference
 
@@ -42,14 +42,14 @@ erdos ="""@inproceedings{bollobas1976cliques,
 }"""
 
 csl = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apa.csl') 
-html = '<p>Steinhauser, G. (2009). The nature of navel fluff. <em>Medical hypotheses</em>, <em>72</em>, 623-625.</p>\n'
+html = u'<p>Steinhauser, G. (2009). The nature of navel fluff. <em>Medical hypotheses</em>, <em>72</em>(6), 623\u2013625.</p>\n'
 
-class AccentTestCase(unittest.TestCase):
+class AccentTestCase(TestCase):
     def test_accent(self):
         reference = Reference(bibtex=erdos)
         self.assertEqual(reference.get_authors(), u'B Bollob\u2019as & P Erdos')
 
-class SingleReferenceTestCase(unittest.TestCase):
+class SingleReferenceTestCase(TestCase):
     def setUp(self):
         self.reference = Reference(bibtex=fluff)
         self.reference.save()
