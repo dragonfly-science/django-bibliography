@@ -16,9 +16,16 @@ INSTALLED_APPS = (
 
     'south',
     'taggit',
+    'django_nose',
 
     'bibliography',
 )
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-xunit', '--with-doctest'
+    ]
+
 
 SECRET_KEY = 'secret_key'
 SITE_ID = 1
