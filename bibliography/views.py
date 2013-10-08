@@ -1,5 +1,4 @@
 import re
-import logging
 
 from django.shortcuts import render_to_response, get_list_or_404
 from django.template.loader import render_to_string
@@ -18,6 +17,7 @@ def markdown_post_references(text, instance=None, check=False):
     text = re.sub('\[References\s*(\w[\w=\'" -]+)\]', insert_references,  text)
     return text
 
+
 def reference(request, key):
     current = None
     for r in get_list_or_404(Reference, name=key):
@@ -25,6 +25,7 @@ def reference(request, key):
     return render_to_response('references/view.html', dict(
             current = current, page = dict(title=current.title),
         ), RequestContext(request))
+
 
 def listview(request, query):
     tags = re.findall('tag=([\w-]+)', query)
@@ -57,6 +58,7 @@ def listview(request, query):
                 references = references
             ))
 
+
 def tagging(request,  name):
     if name:
         t = name.split('|')
@@ -74,6 +76,7 @@ def tagging(request,  name):
         return render_to_string('references/tagging.html', dict(
                 references = references
             ))
+
 
 def get_bib(request, key):
     bib = Reference.objects.filter(key = key)[0].bibtex
