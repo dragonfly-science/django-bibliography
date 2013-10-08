@@ -3,8 +3,6 @@ from django import forms
 from django.shortcuts import render_to_response
 from django.conf import settings
 
-from reversion.admin import VersionAdmin
-
 from bibliography.models import Reference, Resource
 
 
@@ -24,7 +22,7 @@ class ReferenceForm(forms.ModelForm):
         model = Reference    
 
 
-class ReferenceAdmin(VersionAdmin):
+class ReferenceAdmin(admin.ModelAdmin):
     list_display = ('key', 'the_tags', 'year', 'reference', 'with_resources')
     search_fields = ('bibtex',)
     save_on_top = True
@@ -83,7 +81,7 @@ class ReferenceAdmin(VersionAdmin):
 admin.site.register(Reference, ReferenceAdmin)
 
 
-class ResourceAdmin(VersionAdmin):
+class ResourceAdmin(admin.ModelAdmin):
     list_display = ('title','url','file')
 admin.site.register(Resource, ResourceAdmin)
 
