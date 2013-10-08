@@ -1,15 +1,19 @@
 import os
-from subprocess import Popen, PIPE
 import xml.etree.ElementTree as ET
-from StringIO import StringIO
 import logging
 import re  
 import unicodedata
 
+from subprocess import Popen, PIPE
+from StringIO import StringIO
+
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
+
 from taggit.managers import TaggableManager
+
+from bibliography.utils import format_bytes
 
 
 MODS_URI_DEFAULT = "http://www.loc.gov/mods/v3"
@@ -17,25 +21,6 @@ CSL_FILE_DEFAULT = os.path.join(os.path.dirname(__file__), 'apa.csl')
 
 BIBLIOGRAPHY_MODS_URI = getattr(settings, 'BIBLIOGRAPHY_MODS_URI', MODS_URI_DEFAULT)
 BIBLIOGRAPHY_CSL = getattr(settings, 'BIBLIOGRAPHY_CSL', CSL_FILE_DEFAULT)
-
-
-def convert_bytes(num_bytes):
-    num_bytes = float(num_bytes)
-    if num_bytes >= 1099511627776:
-        terabytes = num_bytes / 1099511627776
-        size = '%i TB' % terabytes
-    elif num_bytes >= 1073741824:
-        gigabytes = num_bytes / 1073741824
-        size = '%i GB' % gigabytes
-    elif num_bytes >= 1048576:
-        megabytes = num_bytes / 1048576
-        size = '%i MB' % megabytes
-    elif num_bytes >= 1024:
-        kilobytes = num_bytes / 1024
-        size = '%i kB' % kilobytes
-    else:
-        size = '%i bytes' % num_bytes
-    return size
 
 
 class Reference(models.Model):
@@ -110,7 +95,7 @@ class Reference(models.Model):
                 rel_url = ffile.url
                 abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
-                f_size = convert_bytes(os.path.getsize(abs_url))
+                f_size = format_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=f.title, file=rel_url, type=f_type, size=f_size))
         return dic
 
@@ -131,7 +116,7 @@ class Reference(models.Model):
                 rel_url = r.file.url
                 abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
-                f_size = convert_bytes(os.path.getsize(abs_url))
+                f_size = format_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=r.title, short_name=r.list_title, file=rel_url, type=f_type, size=f_size, url=None, pos=r.pos))
             elif r.url:
                 dic.append(dict(name=r.title, short_name=r.list_title, file=None, type=None, size=None, url=r.url, pos=r.pos))
@@ -238,13 +223,13 @@ class Reference(models.Model):
         return self._tree
     
     def xml_find(self, tag):
-        return self.get_xml_tree().find(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().find(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findtext(self, tag):
-        return self.get_xml_tree().findtext(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().findtext(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findall(self, tag):
-        return self.get_xml_tree().findall(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().findall(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
 class Resource(models.Model):
     reference = models.ForeignKey('Reference')
@@ -253,5 +238,6 @@ class Resource(models.Model):
     title = models.CharField(max_length=255,null=True, blank=True)
     list_title = models.CharField(max_length=255, null=True, blank=True)
     pos = models.IntegerField(null=True, blank=True)
+
     def __unicode__(self):
         return "%s - %s" % (self.title, self.reference)

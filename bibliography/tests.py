@@ -1,10 +1,11 @@
 import os
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from bibliography.models import Reference
 
-fluff="""@article{steinhauser2009nature,
+fluff = """@article{steinhauser2009nature,
 title={The nature of navel fluff},
 author={Steinhauser, G.},
 journal={Medical hypotheses},
@@ -31,7 +32,7 @@ cutaneous scales, fat or proteins. Incidentally, lint might thus fulfill a
 cleaning function for the navel.} 
 }"""
 
-erdos ="""@inproceedings{bollobas1976cliques,
+erdos = """@inproceedings{bollobas1976cliques,
   title={Cliques in random graphs},
   author={Bollob{\'a}s, B. and Erdos, P.},
   booktitle={Mathematical Proceedings of the Cambridge Philosophical Society},
@@ -47,11 +48,13 @@ csl = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apa.csl')
 html = u'<p>Steinhauser, G. (2009). The nature of navel fluff. <em>Medical hypotheses</em>, <em>72</em>(6), 623\u2013625.</p>\n'
 
 class AccentTestCase(TestCase):
+
     def test_accent(self):
         reference = Reference(bibtex=erdos)
         self.assertEqual(reference.get_authors(), u'B Bollob\u2019as & P Erdos')
 
 class SingleReferenceTestCase(TestCase):
+
     def setUp(self):
         self.reference = Reference(bibtex=fluff)
         self.reference.save()
@@ -80,3 +83,24 @@ class SingleReferenceTestCase(TestCase):
         """Check that the abstract is returned"""    
         self.assertIn('lint', self.reference.get_abstract())
         self.assertIn('Why do men have nipples', self.reference.get_abstract())
+
+
+class ReferenceViewTest(TestCase):
+
+    def setUp(self):
+        self.reference = Reference(bibtex=fluff)
+        self.reference.save()
+        self.reference.tags.add('blah')
+
+    def test_get_bib(self):
+        url = reverse('show_reference_as_bibtex', kwargs=dict(key=self.reference.key))
+        response = self.client.get(url)
+
+    def test_get_html(self):
+        url = reverse('show_reference', kwargs=dict(key=self.reference.key))
+        response = self.client.get(url)
+
+    def test_tagging(self):
+        url = reverse('admin_tagging', kwargs=dict(tag_name='blah'))
+        response = self.client.get(url)
+

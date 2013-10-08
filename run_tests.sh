@@ -2,3 +2,4 @@
 # coverage plugin and results in incorrect coverage reports.
 coverage run manage.py test $@
 coverage html --include=bibliography\*
+coverage xml --include=bibliography\*
