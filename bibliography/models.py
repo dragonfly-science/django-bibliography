@@ -1,47 +1,33 @@
 import os
-from subprocess import Popen, PIPE
 import xml.etree.ElementTree as ET
-from StringIO import StringIO
 import logging
 import re  
 import unicodedata
 
+from subprocess import Popen, PIPE
+from StringIO import StringIO
+
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
-from django.utils.encoding import smart_str, smart_unicode
+
 from taggit.managers import TaggableManager
 
-try:
-    from settings import BIBLIOGRAPHY_CSL
-except ImportError:
-    BIBLIOGRAPHY_CSL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apa.csl')
-try:
-    from settings import BIBLIOGRAPHY_MODS_URI
-except ImportError:
-    BIBLIOGRAPHY_MODS_URI = "http://www.loc.gov/mods/v3"
+from bibliography.utils import format_bytes
 
-def convert_bytes(bytes):
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
-        size = '%i TB' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
-        size = '%i GB' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
-        size = '%i MB' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
-        size = '%i kB' % kilobytes
-    else:
-        size = '%i bytes' % bytes
-    return size
+
+MODS_URI_DEFAULT = "http://www.loc.gov/mods/v3"
+CSL_FILE_DEFAULT = os.path.join(os.path.dirname(__file__), 'apa.csl')
+
+BIBLIOGRAPHY_MODS_URI = getattr(settings, 'BIBLIOGRAPHY_MODS_URI', MODS_URI_DEFAULT)
+BIBLIOGRAPHY_CSL = getattr(settings, 'BIBLIOGRAPHY_CSL', CSL_FILE_DEFAULT)
+
 
 class Reference(models.Model):
     key = models.SlugField(max_length=50, editable=False)
+
     bibtex = models.TextField()
+
     year = models.IntegerField(editable=False, null=True, blank=True)
     html = models.TextField(editable=False)
     sort = models.TextField(editable=False, null=True, blank=True)
@@ -51,13 +37,13 @@ class Reference(models.Model):
     doi = models.TextField(editable=False, null=True, blank=True)
     tags = TaggableManager()
 
-    def __unicode__(self):
-        return "%s:%s" % (self.key, self.id)
-
     class Meta:
         unique_together = ("key",)
         ordering = ('sort', '-year', 'key')
     
+    def __unicode__(self):
+        return "%s:%s" % (self.key, self.id)
+
     def get_absolute_url(self):
         return "%s/references/%s.html"%(settings.SITE_URL, self.key)
 
@@ -109,7 +95,7 @@ class Reference(models.Model):
                 rel_url = ffile.url
                 abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
-                f_size = convert_bytes(os.path.getsize(abs_url))
+                f_size = format_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=f.title, file=rel_url, type=f_type, size=f_size))
         return dic
 
@@ -130,7 +116,7 @@ class Reference(models.Model):
                 rel_url = r.file.url
                 abs_url = os.path.join(settings.MEDIA_ROOT, rel_url)
                 f_type = re.sub('\.','',os.path.splitext(abs_url)[1])
-                f_size = convert_bytes(os.path.getsize(abs_url))
+                f_size = format_bytes(os.path.getsize(abs_url))
                 dic.append(dict(name=r.title, short_name=r.list_title, file=rel_url, type=f_type, size=f_size, url=None, pos=r.pos))
             elif r.url:
                 dic.append(dict(name=r.title, short_name=r.list_title, file=None, type=None, size=None, url=r.url, pos=r.pos))
@@ -208,12 +194,15 @@ class Reference(models.Model):
             p = Popen(['bib2html', csl], stdin=PIPE, stdout=PIPE, stderr=PIPE)
             html, err = p.communicate(bibtex)
             if p.returncode != 0:
+                if settings.DEBUG:
+                    logging.error("get_html stdout = %s" % html)
+                    logging.error("get_html stderr = %s" % err)
                 logging.warn("get_html return code = %s" % p.returncode)
                 html = ''
         except OSError, e:
             html = ''
             logging.warn("Execution of bib2html failed: %s" % e)
-        return html
+        return html.decode('utf-8')
 
     def get_sort(self, csl=BIBLIOGRAPHY_CSL):
         try:
@@ -234,20 +223,21 @@ class Reference(models.Model):
         return self._tree
     
     def xml_find(self, tag):
-        return self.get_xml_tree().find(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().find(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findtext(self, tag):
-        return self.get_xml_tree().findtext(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().findtext(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
     def xml_findall(self, tag):
-        return self.get_xml_tree().findall(".//{%s}%s"%(BIBLIOGRAPHY_MODS_URI, tag))
+        return self.get_xml_tree().findall(".//{%s}%s" % (BIBLIOGRAPHY_MODS_URI, tag))
 
 class Resource(models.Model):
     reference = models.ForeignKey('Reference')
     file = models.FileField(upload_to='resources', null=True, blank=True, max_length=256)
-    url = models.URLField(verify_exists=False, null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
     title = models.CharField(max_length=255,null=True, blank=True)
     list_title = models.CharField(max_length=255, null=True, blank=True)
     pos = models.IntegerField(null=True, blank=True)
+
     def __unicode__(self):
         return "%s - %s" % (self.title, self.reference)

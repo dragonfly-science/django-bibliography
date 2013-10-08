@@ -2,7 +2,7 @@
 {% block content %}
 
 {% if user.is_authenticated and perms.website.administration %}
-  <p style="float:right"><a class="fade" href="{% url admin:bibliography_reference_change current.id %}">Edit Reference</a></p>
+  <p style="float:right"><a class="fade" href="{% url 'admin:bibliography_reference_change' current.id %}">Edit Reference</a></p>
 {% endif %}
 
 <div class="reference_title"><h2>{{ current.title }}</h2></div>

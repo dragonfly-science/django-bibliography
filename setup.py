@@ -6,5 +6,5 @@ setup(name = "bibliography",
     author = "Edward Abraham",
     author_email = "edward@dragonfly.co.nz",
     url = "https://github.com/dragonfly-science/django-bibliography",
-    packages = ['bibliography'],
+    packages = ['bibliography', 'bibliography.migrations', 'bibliography.management', 'bibliography.management.commands'],
 ) 
