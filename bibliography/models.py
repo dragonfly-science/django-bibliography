@@ -9,35 +9,34 @@ import unicodedata
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
-from django.utils.encoding import smart_str, smart_unicode
 from taggit.managers import TaggableManager
 
-try:
-    from settings import BIBLIOGRAPHY_CSL
-except ImportError:
-    BIBLIOGRAPHY_CSL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apa.csl')
-try:
-    from settings import BIBLIOGRAPHY_MODS_URI
-except ImportError:
-    BIBLIOGRAPHY_MODS_URI = "http://www.loc.gov/mods/v3"
 
-def convert_bytes(bytes):
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
+MODS_URI_DEFAULT = "http://www.loc.gov/mods/v3"
+CSL_FILE_DEFAULT = os.path.join(os.path.dirname(__file__), 'apa.csl')
+
+BIBLIOGRAPHY_MODS_URI = getattr(settings, 'BIBLIOGRAPHY_MODS_URI', MODS_URI_DEFAULT)
+BIBLIOGRAPHY_CSL = getattr(settings, 'BIBLIOGRAPHY_CSL', CSL_FILE_DEFAULT)
+
+
+def convert_bytes(num_bytes):
+    num_bytes = float(num_bytes)
+    if num_bytes >= 1099511627776:
+        terabytes = num_bytes / 1099511627776
         size = '%i TB' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
+    elif num_bytes >= 1073741824:
+        gigabytes = num_bytes / 1073741824
         size = '%i GB' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
+    elif num_bytes >= 1048576:
+        megabytes = num_bytes / 1048576
         size = '%i MB' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
+    elif num_bytes >= 1024:
+        kilobytes = num_bytes / 1024
         size = '%i kB' % kilobytes
     else:
-        size = '%i bytes' % bytes
+        size = '%i bytes' % num_bytes
     return size
+
 
 class Reference(models.Model):
     key = models.SlugField(max_length=50, editable=False)
@@ -53,13 +52,13 @@ class Reference(models.Model):
     doi = models.TextField(editable=False, null=True, blank=True)
     tags = TaggableManager()
 
-    def __unicode__(self):
-        return "%s:%s" % (self.key, self.id)
-
     class Meta:
         unique_together = ("key",)
         ordering = ('sort', '-year', 'key')
     
+    def __unicode__(self):
+        return "%s:%s" % (self.key, self.id)
+
     def get_absolute_url(self):
         return "%s/references/%s.html"%(settings.SITE_URL, self.key)
 
