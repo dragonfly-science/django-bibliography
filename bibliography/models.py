@@ -35,7 +35,7 @@ class Reference(models.Model):
     title = models.TextField(editable=False, null=True, blank=True)
     abstract = models.TextField(editable=False, null=True, blank=True)
     doi = models.TextField(editable=False, null=True, blank=True)
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         unique_together = ("key",)
