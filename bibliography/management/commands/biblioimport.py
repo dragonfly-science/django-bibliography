@@ -43,14 +43,14 @@ class Command(BaseCommand):
     )
     def handle(self, *args, **options):
         fname = options['in_file']
-        self.stdout.write('-- Importing references in %s' % options.in_file)
+        self.stdout.write('-- Importing references in %s' % fname)
         if not os.path.exists(fname):
             CommandError('Input file does not exist.')
 
         if options['force']:
             self.stdout.write('-- Force import' + os.linesep)
 
-        if options.clear:
+        if options['clear']:
             self.stdout.write('-- Clear tags before import' + os.linesep)
 
         with open(fname, 'r') as f:
@@ -83,12 +83,12 @@ class Command(BaseCommand):
                 self.stderr.write("Warning: Failed to load @%s" % rec)
                 nfail += 1
                 continue
-            if not rkey in allkeys or options.force:
+            if not rkey in allkeys or options['force']:
                 self.stdout.write("%s %s" % (action, rkey))
                 bib.save()
-                if options.clear:
+                if options['clear']:
                     bib.tags.clear()
-                for a in options.tags:
+                for a in options['tags']:
                             bib.tags.add(a)
                 keywords = get_keywords(rec)
                 if keywords:
