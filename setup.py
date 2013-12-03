@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name = "bibliography",
-    version = "2",
+    version = "3.0.0",
     description = "Bibliography management for Django",
     author = "Edward Abraham",
     author_email = "edward@dragonfly.co.nz",
