@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     url(r'^admin/tagging/(?P<tag_name>.*)$', tagging, name='admin_tagging'),
 )
  
-if settings.BIBLIOGRAPHY_DEV_MODE:
+if getattr(settings, 'BIBLIOGRAPHY_DEV_MODE', False):
     # Only load in admin if we are doing local work on django-bibliography
     admin.autodiscover()
 
