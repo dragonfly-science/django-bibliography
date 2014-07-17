@@ -3,7 +3,7 @@
 {{ r.html|safe }}
 </div>
 <div class="reference_details">
-[ <a href='/references/{{r.name}}.html'>Summary</a> 
+[ <a href='/references/{{r.key}}.html'>Summary</a> 
 {% for rr in r.res_list %}
             {% if rr.short_name %}
                 {% if rr.file %} | <a href="/{{ rr.file }}">{{ rr.short_name }} ({{ rr.type }}, {{ rr.size }})</a>
