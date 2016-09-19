@@ -20,7 +20,7 @@ class ReferenceForm(forms.ModelForm):
 
     class Meta:
         model = Reference    
-
+        exclude = ()
 
 class ReferenceAdmin(admin.ModelAdmin):
     list_display = ('key', 'the_tags', 'year', 'reference', 'with_resources')
