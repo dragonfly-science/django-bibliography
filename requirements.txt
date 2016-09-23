@@ -1,6 +1,6 @@
-Django>=1.5.2,<1.6
-git+https://github.com/hcarvalhoalves/django-taggit.git@0.9.3
+Django>=1.8,<1.9
+django-taggit==0.21.2
 
 nose
 django-nose
-coverage
+coverage==3.7.1

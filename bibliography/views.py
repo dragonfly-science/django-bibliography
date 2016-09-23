@@ -41,4 +41,4 @@ def tagging(request, tag_name):
 def get_bib(request, key):
     bib = Reference.objects.filter(key = key)[0].bibtex
     return render_to_response('references/bib.bib', dict(
-                bib = bib), mimetype='text/plain')
+                bib = bib), content_type='text/plain')

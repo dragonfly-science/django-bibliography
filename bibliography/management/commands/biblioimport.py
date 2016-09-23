@@ -10,7 +10,6 @@ import pdb
 from optparse import make_option
 sys.path.append('/usr/local/django')
 
-from django.core.management import setup_environ
 from django.core.management.base import BaseCommand, CommandError
 
 from bibliography.models import Reference

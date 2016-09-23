@@ -14,14 +14,12 @@ MEDIA_ROOT = '.'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
-    'django.contrib.markup',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.staticfiles',
 
-    'south',
     'taggit',
     'django_nose',
 
